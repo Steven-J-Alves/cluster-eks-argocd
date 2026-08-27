@@ -25,6 +25,9 @@ variables:
     entrypoint: [""]
   tags:
     - docker-scale
+  environment:
+    name: $CI_COMMIT_BRANCH   # required for env-scoped CI variables (TF_VARS_FILE_*)
+    action: prepare
   before_script:
     - export ENV="$CI_COMMIT_BRANCH"
     - test -f "$TF_DIR/environments/$ENV/backend.hcl" || { echo "No backend.hcl for env=$ENV"; exit 1; }
