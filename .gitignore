@@ -1,0 +1,25 @@
+# Never upload
+docs/
+app/
+_readme-backup/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Terraform state and local caches
+**/.terraform/*
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+crash.log
+crash.*.log
+*.lock.hcl
+
+# Backups
+*.bak
+*.bak.yml

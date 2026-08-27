@@ -1,0 +1,36 @@
+# argocd-apps chart 2.x — applications is a MAP keyed by app name.
+# Ref: https://github.com/argoproj/argo-helm/tree/main/charts/argocd-apps
+applications:
+  demo:
+    namespace: argocd
+    additionalLabels: {}
+    additionalAnnotations: {}
+    project: default
+    source:
+      repoURL: placeholder             # overridden by helm_release set{} in 12-helm.tf
+      targetRevision: HEAD             # overridden by helm_release set{} in 12-helm.tf
+      path: demoapp
+      directory:
+        recurse: true
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: application
+    syncPolicy:
+      automated:
+        prune: false
+        selfHeal: false
+    revisionHistoryLimit: null
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /spec/replicas
+    info:
+      - name: url
+        value: https://argoproj.github.io/
+
+projects: {}
+
+applicationsets: {}
+
+extensions: {}

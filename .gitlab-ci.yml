@@ -1,0 +1,79 @@
+# Branch-per-env pipeline
+# Push to dev/staging/qa/prod → CI targets the matching environment folder.
+# Requires GitLab CI/CD variables:
+#   TF_VARS_FILE_DEV      (file variable — dev terraform.tfvars contents)
+#   TF_VARS_FILE_STAGING  (file variable — staging terraform.tfvars contents)
+#   TF_VARS_FILE_QA       (file variable — qa terraform.tfvars contents)
+#   TF_VARS_FILE_PROD     (file variable — prod terraform.tfvars contents)
+# `dr` runs manually (not from CI) — see cluster/environments/README.md
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+variables:
+  TF_DIR: "terraform/cluster"
+
+.env_rules: &env_rules
+  - if: '$CI_COMMIT_BRANCH =~ /^(dev|staging|qa|prod)$/'
+
+.terraform:
+  image:
+    name: hashicorp/terraform:1.13.3
+    entrypoint: [""]
+  tags:
+    - docker-scale
+  before_script:
+    - export ENV="$CI_COMMIT_BRANCH"
+    - test -f "$TF_DIR/environments/$ENV/backend.hcl" || { echo "No backend.hcl for env=$ENV"; exit 1; }
+    - |
+      case "$ENV" in
+        dev)     cp "$TF_VARS_FILE_DEV"     "$TF_DIR/environments/$ENV/terraform.tfvars" ;;
+        staging) cp "$TF_VARS_FILE_STAGING" "$TF_DIR/environments/$ENV/terraform.tfvars" ;;
+        qa)      cp "$TF_VARS_FILE_QA"      "$TF_DIR/environments/$ENV/terraform.tfvars" ;;
+        prod)    cp "$TF_VARS_FILE_PROD"    "$TF_DIR/environments/$ENV/terraform.tfvars" ;;
+        *)       echo "Unknown env=$ENV"; exit 1 ;;
+      esac
+    - terraform -chdir="$TF_DIR" init -reconfigure -backend-config="environments/$ENV/backend.hcl"
+
+validate:
+  extends: .terraform
+  stage: validate
+  script:
+    - terraform -chdir="$TF_DIR" validate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - *env_rules
+
+plan:
+  extends: .terraform
+  stage: plan
+  script:
+    - terraform -chdir="$TF_DIR" plan -var-file="environments/$ENV/terraform.tfvars" -out=tfplan
+  artifacts:
+    paths:
+      - terraform/cluster/tfplan
+    expire_in: 1 hour
+  rules:
+    - *env_rules
+
+apply:
+  extends: .terraform
+  stage: apply
+  script:
+    - terraform -chdir="$TF_DIR" apply -auto-approve tfplan
+  when: manual
+  needs: [plan]
+  rules:
+    - *env_rules
+
+destroy:
+  extends: .terraform
+  stage: destroy
+  script:
+    - terraform -chdir="$TF_DIR" destroy -auto-approve -var-file="environments/$ENV/terraform.tfvars"
+  when: manual
+  rules:
+    - *env_rules

@@ -1,0 +1,32 @@
+# dr environment — Disaster Recovery in a different AWS region
+# Sized as warm standby: half of prod capacity, promotable to full within minutes.
+#
+# STATUS: NOT ACTIVE.  This env exists in code only. No AWS resources are provisioned.
+#
+# To activate DR:
+#   1. cp terraform.tfvars.example terraform.tfvars      # fill in real secrets
+#   2. cd ../../.. && terraform init -reconfigure \
+#         -backend-config=environments/dr/backend.hcl
+#   3. terraform apply -var-file=environments/dr/terraform.tfvars
+#
+# To fail over from prod to dr:
+#   1. Promote the DR RDS read-replica to primary
+#   2. Bump `node_desired_size` here to match prod (e.g. 2 or 4)
+#   3. terraform apply (with dr backend + var-file)
+#   4. Switch Route53 `argocd-lab.kriolu-kloud.cv` to point at the DR NLB
+tag_env     = "dr"
+aws_region  = "us-west-2"                              # Oregon — separate from us-east-1
+base_domain = "argocd-lab.kriolu-kloud.cv"    # fixed — URLs become argo.dr.argocd-lab.kriolu-kloud.cv
+
+vpc_cidr            = "10.90.0.0/16"                   # different from prod for future peering
+eks_cluster_version = "1.31"
+node_instance_types = ["t3.large"]
+node_desired_size   = 1                                # warm standby (bump to prod size on failover)
+
+id_rsa            = "ssh-rsa AAAA...replace-with-your-public-key... user@host"
+registrationToken = "ghp_replace_with_github_pat_repo_workflow_scope"
+
+ci_project_repo   = "kriolu-kloud/devops/eks/cluster-eks-argoci/app"
+cd_project_repo   = "kriolu-kloud/devops/eks/cluster-eks-argoci/manifests"
+gitlab_url        = "https://gitlab.kriolu-kloud.cv"
+gitlab_token      = "glpat-replace_with_gitlab_pat"

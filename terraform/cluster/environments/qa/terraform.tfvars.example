@@ -1,0 +1,17 @@
+# qa environment — for automated tests and QA validation
+tag_env     = "qa"
+aws_region  = "us-east-1"
+base_domain = "argocd-lab.kriolu-kloud.cv"    # fixed — URLs become argo.qa.argocd-lab.kriolu-kloud.cv
+
+vpc_cidr            = "10.30.0.0/16"
+eks_cluster_version = "1.31"
+node_instance_types = ["t3.medium"]
+node_desired_size   = 2
+
+id_rsa            = "ssh-rsa AAAA...replace-with-your-public-key... user@host"
+registrationToken = "ghp_replace_with_github_pat_repo_workflow_scope"
+
+ci_project_repo   = "kriolu-kloud/devops/eks/cluster-eks-argoci/app"
+cd_project_repo   = "kriolu-kloud/devops/eks/cluster-eks-argoci/manifests"
+gitlab_url        = "https://gitlab.kriolu-kloud.cv"
+gitlab_token      = "glpat-replace_with_gitlab_pat"

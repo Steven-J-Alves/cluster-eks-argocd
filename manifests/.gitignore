@@ -1,0 +1,11 @@
+_readme-backup/
+.DS_Store
+
+# Defensive excludes — should never leak in
+docs/
+app/
+_readme-backup/
+.DS_Store
+.idea/
+.vscode/
+

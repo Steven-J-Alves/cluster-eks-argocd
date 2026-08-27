@@ -1,0 +1,78 @@
+name: Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'prod'
+        type: choice
+        options: [dev, staging, qa, prod, dr]
+      action:
+        description: 'Terraform action'
+        required: true
+        default: 'plan'
+        type: choice
+        options: [plan, apply, destroy]
+
+env:
+  TF_DIR: terraform/cluster
+  AWS_REGION: us-east-1     # overridden per env if needed (dr uses us-west-2)
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/cluster
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set env-specific region
+        id: region
+        run: |
+          case "${{ inputs.environment }}" in
+            dr) echo "AWS_REGION=us-west-2" >> $GITHUB_ENV ;;
+            *)  echo "AWS_REGION=us-east-1" >> $GITHUB_ENV ;;
+          esac
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.3
+
+      - name: Write tfvars for ${{ inputs.environment }}
+        run: |
+          case "${{ inputs.environment }}" in
+            dev)     echo "${{ secrets.TF_VARS_FILE_DEV }}"     > environments/dev/terraform.tfvars ;;
+            staging) echo "${{ secrets.TF_VARS_FILE_STAGING }}" > environments/staging/terraform.tfvars ;;
+            qa)      echo "${{ secrets.TF_VARS_FILE_QA }}"      > environments/qa/terraform.tfvars ;;
+            prod)    echo "${{ secrets.TF_VARS_FILE_PROD }}"    > environments/prod/terraform.tfvars ;;
+            dr)      echo "${{ secrets.TF_VARS_FILE_DR }}"      > environments/dr/terraform.tfvars ;;
+          esac
+
+      - name: Terraform Init (env=${{ inputs.environment }})
+        run: terraform init -reconfigure -backend-config=environments/${{ inputs.environment }}/backend.hcl
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=environments/${{ inputs.environment }}/terraform.tfvars -out=tfplan
+
+      - name: Terraform Apply
+        if: ${{ inputs.action == 'apply' }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Terraform Destroy
+        if: ${{ inputs.action == 'destroy' }}
+        run: terraform destroy -auto-approve -var-file=environments/${{ inputs.environment }}/terraform.tfvars
