@@ -1,11 +1,11 @@
-# cluster-eks-argoci
+# cluster-eks-argocd
 
 GitOps platform running a containerised web application on Amazon EKS, managed entirely through Infrastructure as Code and automated CI/CD pipelines.
 
 ## Repository layout
 
 ```
-cluster-eks-argoci/
+cluster-eks-argocd/
 ├── terraform/    # AWS infrastructure (EKS, VPC, RDS, Lambda, SQS, ECR, S3 …)
 ├── app/          # Application source code + Docker builds + CI pipeline
 ├── manifests/    # Kubernetes manifests pushed by CI, watched by ArgoCD
