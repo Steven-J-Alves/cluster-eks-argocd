@@ -1,6 +1,10 @@
 # terraform
 
-AWS infrastructure for the EKS GitOps platform. Terraform ≥ 1.9, provider `hashicorp/aws ~> 5.35`.
+AWS infrastructure for the EKS GitOps platform. Terraform ≥ 1.9 (CI runs 1.13.3), provider `hashicorp/aws ~> 5.35` (resolves to 5.100+).
+
+## Architecture
+
+![Terraform infrastructure](architecture.png)
 
 ## Layout
 
@@ -47,15 +51,24 @@ terraform/
 
 Remote state in S3 with DynamoDB locking. Shared between GitLab CI and GitHub Actions — only one apply can run at a time.
 
+The `key` is supplied per-env via `-backend-config=environments/<env>/backend.hcl`:
+
 ```hcl
+# versions.tf — partial config (no key)
 backend "s3" {
-  bucket         = "<your-tf-state-bucket>"
-  key            = "argoeks/dev/terraform.tfstate"
+  bucket         = "kriolu-kloud-terraform-tfstates"
   region         = "us-east-1"
-  dynamodb_table = "<your-lock-table>"
+  dynamodb_table = "argoeks-tfstate-lock"
   encrypt        = true
 }
 ```
+
+```hcl
+# environments/prod/backend.hcl
+key = "argoeks/prod/terraform.tfstate"
+```
+
+Each env has its own state file: `argoeks/dev/`, `argoeks/staging/`, `argoeks/qa/`, `argoeks/prod/`, `argoeks/dr/`.
 
 **Protections in place:**
 - S3 versioning: **enabled** — any state file version can be restored via `aws s3api list-object-versions`
@@ -66,12 +79,14 @@ backend "s3" {
 
 ```bash
 cd cluster/
-terraform init
-terraform plan -var-file=environments/prod/terraform.tfvars
+terraform init -reconfigure -backend-config=environments/prod/backend.hcl
+terraform plan  -var-file=environments/prod/terraform.tfvars
 terraform apply -var-file=environments/prod/terraform.tfvars
 ```
 
-The CI pipelines copy the appropriate tfvars file (from GitLab CI Variables or GitHub Actions Secrets) into `cluster/terraform.tfvars` before running.
+Switch env: change `prod` → `dev` / `staging` / `qa` / `dr` in both `-backend-config=...` and `-var-file=...`. Always use `-reconfigure` when changing envs.
+
+The CI pipelines copy the appropriate tfvars file (from `TF_VARS_FILE_<ENV>` GitLab CI Variable / GitHub Actions Secret) into `environments/<env>/terraform.tfvars` before running.
 
 ## State hygiene rules (don't break these — that's how orphans happen)
 
@@ -102,51 +117,48 @@ Each module in `modules/` follows the pattern:
 
 Local modules make version bumps and shared configuration easy. Registry modules are pinned with `~>` so we get patch updates automatically without breaking major-version compatibility.
 
-## Branch-per-env workflow (all 3 repos)
+## Branch-per-env workflow
 
-Every repo (`terraform`, `app`, `manifests`) has the same branch layout:
+Both this repo and [`app-eks-argocd`](https://gitlab.kriolu-kloud.cv/kriolu-kloud/apps-for-deploy/app-eks-argocd) share the same branch layout:
 
-| Branch | Role |
-|---|---|
-| `main` | default — feature integration, PR reviews, no auto-deploy |
-| `dev` | push here → deploy to `dev` env |
-| `staging` | push here → deploy to `staging` env |
-| `qa` | push here → deploy to `qa` env |
-| `prod` | push here → deploy to `prod` env |
-| `dr` | *(terraform only)* — deploy to DR region on demand |
+| Branch    | Role                                                       |
+|-----------|------------------------------------------------------------|
+| `main`    | default — feature integration, PR reviews, no auto-deploy  |
+| `dev`     | push here → deploy to `dev` env                            |
+| `staging` | push here → deploy to `staging` env                        |
+| `qa`      | push here → deploy to `qa` env                             |
+| `prod`    | push here → deploy to `prod` env                           |
+| `dr`      | *(this repo only)* deploy to DR region on demand           |
 
 Rule of thumb:
 - Develop on feature branches → merge to `main`
 - Promote: `main → dev → staging → qa → prod`
 - Each env has its own S3 state, its own tfvars, its own AWS resources
 
-### GitLab CI Variables you need to configure
+### GitLab CI Variables for the terraform pipeline (this repo)
 
-For the terraform pipeline:
+| Variable                                        | Type              | Contents                                            |
+|-------------------------------------------------|-------------------|-----------------------------------------------------|
+| `TF_VARS_FILE_DEV`                              | File              | dev `terraform.tfvars` contents                     |
+| `TF_VARS_FILE_STAGING`                          | File              | idem for staging                                    |
+| `TF_VARS_FILE_QA`                               | File              | idem for qa                                         |
+| `TF_VARS_FILE_PROD`                             | File              | idem for prod                                       |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`   | Variable (masked) | AWS credentials                                     |
 
-| Variable | Type | Contents |
-|---|---|---|
-| `TF_VARS_FILE_DEV` | File | `terraform.tfvars` contents for dev env |
-| `TF_VARS_FILE_STAGING` | File | idem for staging |
-| `TF_VARS_FILE_QA` | File | idem for qa |
-| `TF_VARS_FILE_PROD` | File | idem for prod |
-| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | Variable | AWS credentials |
+### GitLab CI Variables for the app pipeline (`app-eks-argocd`)
 
-For the app pipeline:
+| Variable                                        | Type              | Contents                                                |
+|-------------------------------------------------|-------------------|---------------------------------------------------------|
+| `ACCOUNT_ID`                                    | Variable (masked) | AWS account ID (e.g. `598552768939`)                    |
+| `CD_REPO_PATH`                                  | Variable          | `kriolu-kloud/devops/eks/cluster-eks-argocd`            |
+| `GITLAB_TOKEN`                                  | Variable (masked) | PAT with write access to this repo                      |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`   | Variable (masked) | AWS credentials                                         |
 
-| Variable | Type | Contents |
-|---|---|---|
-| `CI_ACCOUNT_ID` | Variable | AWS account ID |
-| `CI_CD_REPO_PATH` | Variable | e.g. `kriolu-kloud/devops/eks/cluster-eks-argoci/manifests` |
-| `GITLAB_TOKEN` | Variable (masked) | Token to push to manifests repo |
+### GitHub Actions equivalents
 
-For the GitHub Actions workflows:
+**Terraform (this repo):**  `TF_VARS_FILE_<ENV>`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` as **Secrets**.
 
-| Secret | Purpose |
-|---|---|
-| `TF_VARS_FILE_DEV/STAGING/QA/PROD/DR` | Same as GitLab, but as GitHub Actions secrets |
-| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | AWS credentials |
-| `API_TOKEN_GITHUB` | Token to push to manifests repo |
+**App (`app-eks-argocd`):**  `AWS_*` + `API_TOKEN_GITHUB` as **Secrets**;  `ACCOUNT_ID`, `AWS_REGION`, `BASE_DOMAIN`, `APPLICATION_NAME`, `APPLICATION_NAMESPACE`, `CD_DESTINATION_OWNER=Steven-J-Alves`, `CD_PROJECT=cluster-eks-argocd` as **Variables**.
 
 ## Destroying
 

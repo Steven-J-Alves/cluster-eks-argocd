@@ -1,0 +1,205 @@
+<mxfile host="65bd71144e">
+    <diagram name="cicd-flow" id="cicd-flow">
+        <mxGraphModel dx="1769" dy="1370" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="CI/CD Flow — GitLab &amp; GitHub Actions (branch-per-env: dev · staging · qa · prod)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="15" width="1300" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-box" value="Legend" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=11;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="1450" y="60" width="190" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-gl" value="GitLab (primary)" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="30" width="170" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-gh" value="GitHub (mirror)" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="55" width="170" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-stage" value="Pipeline stage" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="80" width="170" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-vars" value="Vars / Secrets" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="105" width="170" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-aws" value="AWS resource" style="rounded=1;fillColor=#ffffff;strokeColor=#232F3E;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="130" width="170" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-manual" value="Manual trigger" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="155" width="170" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-solid" value="── Auto pipeline" style="text;html=1;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="180" width="170" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-dashed" value="- - - Cross-repo push" style="text;html=1;fontSize=9;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="200" width="170" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="dev" value="Developer" style="shape=mxgraph.aws4.user;fillColor=#232F3E;fontColor=#ffffff;strokeColor=none;fontStyle=1;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="90" width="55" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="branch-lbl" value="git push origin &lt;env&gt;&#10;(dev · staging · qa · prod)" style="text;html=1;fontSize=10;fontStyle=2;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="15" y="150" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-title" value="cluster-eks-argocd  —  Terraform pipeline  (infra)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="60" width="700" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gl" value="GitLab CI  (docker-scale runner)" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontStyle=1;fontSize=11;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="95" width="700" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gl-trigger" value="on push  →  branch matches /^(dev|staging|qa|prod)$/" style="text;html=1;fontSize=10;fontStyle=2;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="10" y="35" width="680" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-before" value="before_script:&#10;• ENV = $CI_COMMIT_BRANCH&#10;• cp $TF_VARS_FILE_&lt;ENV&gt; → environments/&lt;env&gt;/terraform.tfvars&#10;• terraform init -reconfigure -backend-config=environments/&lt;env&gt;/backend.hcl" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;align=left;spacingLeft=8;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="10" y="58" width="680" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-validate" value="validate&#10;(stage: validate)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="10" y="135" width="160" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-plan" value="plan  →  tfplan artifact&#10;(stage: plan)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="185" y="135" width="160" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-apply" value="apply -auto-approve tfplan&#10;(stage: apply · MANUAL)" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="360" y="135" width="160" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-destroy" value="destroy -var-file=...&#10;(stage: destroy · MANUAL)" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="530" y="135" width="160" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-vars" value="GitLab CI Variables (env-scoped)&#10;• TF_VARS_FILE_DEV / STAGING / QA / PROD  (File type)&#10;• AWS_ACCESS_KEY_ID · AWS_SECRET_ACCESS_KEY  (masked)" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;align=left;spacingLeft=8;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="10" y="205" width="345" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-state" value="Backend state (per env)&#10;• S3: kriolu-kloud-terraform-tfstates&#10;• Key: argoeks/&lt;env&gt;/terraform.tfstate&#10;• DynamoDB lock: argoeks-tfstate-lock" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=9;align=left;spacingLeft=8;" parent="tf-gl" vertex="1">
+                    <mxGeometry x="365" y="205" width="325" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh" value="GitHub Actions  (ubuntu-latest)" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;fontSize=11;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="95" width="490" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh-trigger" value="workflow_dispatch  (manual)&#10;inputs: environment [dev/staging/qa/prod/dr] · action [plan/apply/destroy]" style="text;html=1;fontSize=10;fontStyle=2;align=left;" parent="tf-gh" vertex="1">
+                    <mxGeometry x="10" y="35" width="470" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh-region" value="region:  dr → us-west-2   ·   others → us-east-1" style="text;html=1;fontSize=9;fontStyle=2;" parent="tf-gh" vertex="1">
+                    <mxGeometry x="10" y="72" width="470" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh-init" value="terraform init -reconfigure&#10;-backend-config=environments/&lt;env&gt;/backend.hcl" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=9;align=left;spacingLeft=8;" parent="tf-gh" vertex="1">
+                    <mxGeometry x="10" y="93" width="470" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh-plan" value="terraform plan → tfplan" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" parent="tf-gh" vertex="1">
+                    <mxGeometry x="10" y="145" width="150" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh-apply" value="apply  (if action=apply)" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" parent="tf-gh" vertex="1">
+                    <mxGeometry x="170" y="145" width="150" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh-destroy" value="destroy  (if action=destroy)" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" parent="tf-gh" vertex="1">
+                    <mxGeometry x="330" y="145" width="150" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="tf-gh-secrets" value="GitHub Actions Secrets&#10;• TF_VARS_FILE_DEV / STAGING / QA / PROD / DR&#10;• AWS_ACCESS_KEY_ID · AWS_SECRET_ACCESS_KEY" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;align=left;spacingLeft=8;" parent="tf-gh" vertex="1">
+                    <mxGeometry x="10" y="195" width="470" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-title" value="app-eks-argocd  —  Application pipeline  (build 3 images + push manifests)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="410" width="900" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gl" value="GitLab CI  (vps shell runner)" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontStyle=1;fontSize=11;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="445" width="700" height="360" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gl-trigger" value="on push  →  branch matches /^(dev|staging|qa|prod)$/&#10;ENVIRONMENT = $CI_COMMIT_BRANCH" style="text;html=1;fontSize=10;fontStyle=2;" parent="app-gl" vertex="1">
+                    <mxGeometry x="10" y="35" width="680" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-inputs" value="stage: inputs  —  get_inputs" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1;verticalAlign=top;" parent="app-gl" vertex="1">
+                    <mxGeometry x="10" y="70" width="680" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-inputs-d" value="SHA8 = $CI_COMMIT_SHA[0:8]      ·      SQS_ARN = aws sqs list-queues + get-queue-attributes" style="text;html=1;fontSize=9;align=left;" parent="app-inputs" vertex="1">
+                    <mxGeometry x="10" y="30" width="660" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-build-title" value="stage: build  (3 parallel Docker jobs, push to ECR &lt;env&gt;/*)" style="text;html=1;fontSize=10;fontStyle=1;" parent="app-gl" vertex="1">
+                    <mxGeometry x="10" y="140" width="680" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-build-api" value="build_api&#10;golang:1.23-alpine → distroless&#10;→ ECR &lt;env&gt;/api:&lt;sha8&gt;" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" parent="app-gl" vertex="1">
+                    <mxGeometry x="10" y="160" width="220" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-build-ui" value="build_ui&#10;node:22 build → nginx:alpine&#10;→ ECR &lt;env&gt;/ui:&lt;sha8&gt;" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" parent="app-gl" vertex="1">
+                    <mxGeometry x="240" y="160" width="220" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-build-lambda" value="build_lambda  ⚠ DOCKER_BUILDKIT=0&#10;golang:1.23-bullseye → lambda/go:1&#10;→ ECR &lt;env&gt;/lambda:&lt;sha8&gt;" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" parent="app-gl" vertex="1">
+                    <mxGeometry x="470" y="160" width="220" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-manifest" value="stage: manifest  —  push_manifests" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1;verticalAlign=top;" parent="app-gl" vertex="1">
+                    <mxGeometry x="10" y="230" width="680" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-manifest-d" value="helm template devops/helm/demoapp  →  rendered YAML&#10;git clone cluster-eks-argocd  →  checkout &lt;env&gt;  →  cp to manifests/demoapp/&#10;git commit + push origin &lt;env&gt;" style="text;html=1;fontSize=9;align=left;" parent="app-manifest" vertex="1">
+                    <mxGeometry x="10" y="30" width="660" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gl-vars" value="GitLab CI Variables&#10;ACCOUNT_ID · CD_REPO_PATH · GITLAB_TOKEN · AWS_ACCESS_KEY_ID · AWS_SECRET_ACCESS_KEY" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;align=left;spacingLeft=8;" parent="app-gl" vertex="1">
+                    <mxGeometry x="10" y="320" width="680" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gh" value="GitHub Actions  (self-hosted via ARC in EKS)" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;fontSize=11;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="445" width="490" height="360" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gh-trigger" value="on:  push [dev/staging/qa/prod]  OR  workflow_dispatch&#10;ENVIRONMENT = github.ref_name" style="text;html=1;fontSize=10;fontStyle=2;" parent="app-gh" vertex="1">
+                    <mxGeometry x="10" y="35" width="470" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gh-1" value="get_inputs  →  SHA8 + SQS_ARN" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="app-gh" vertex="1">
+                    <mxGeometry x="10" y="70" width="470" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gh-2" value="build_images_and_push&#10;api · ui · lambda  →  ECR (1 job, 3 steps)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="app-gh" vertex="1">
+                    <mxGeometry x="10" y="125" width="470" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gh-3" value="k8s_manifest_storing&#10;alpine/helm → template → cpina/push-to-another-repository&#10;target = cluster-eks-argocd/manifests/demoapp on &lt;env&gt; branch" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="app-gh" vertex="1">
+                    <mxGeometry x="10" y="190" width="470" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gh-vars" value="GitHub Actions Vars  (repo-level, all envs share)&#10;ACCOUNT_ID · AWS_REGION · BASE_DOMAIN · APPLICATION_NAME · APPLICATION_NAMESPACE&#10;CD_DESTINATION_OWNER=Steven-J-Alves · CD_PROJECT=cluster-eks-argocd" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;align=left;spacingLeft=8;" parent="app-gh" vertex="1">
+                    <mxGeometry x="10" y="265" width="470" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-gh-secrets" value="Secrets: AWS_ACCESS_KEY_ID · AWS_SECRET_ACCESS_KEY · API_TOKEN_GITHUB" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;align=left;spacingLeft=8;" parent="app-gh" vertex="1">
+                    <mxGeometry x="10" y="325" width="470" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="outputs-title" value="Outputs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="835" width="1300" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="ecr" value="ECR&#10;&lt;env&gt;/api · &lt;env&gt;/ui · &lt;env&gt;/lambda" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;strokeColor=none;fillColor=#EC7211;labelBackgroundColor=#ffffff;align=center;html=1;fontSize=10;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ecr;" parent="1" vertex="1">
+                    <mxGeometry x="270" y="895" width="70" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="mono-manifests" value="cluster-eks-argocd&#10;/manifests/demoapp/&#10;on &lt;env&gt; branch" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontStyle=1;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="895" width="220" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="argocd" value="ArgoCD (in EKS &lt;env&gt; cluster)&#10;watches manifests/demoapp on &lt;env&gt; branch&#10;auto-sync + prune + selfHeal" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="1000" y="895" width="270" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="eks-final" value="EKS &lt;env&gt; cluster&#10;pods reconciled" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;strokeColor=none;fillColor=#EC7211;labelBackgroundColor=#ffffff;align=center;html=1;fontSize=10;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eks;" parent="1" vertex="1">
+                    <mxGeometry x="1370" y="895" width="70" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="mirror-note" value="Both repos have GitLab → GitHub mirror (auto sync).  All branches are pushed to both hosts.  GitLab is source of truth; GitHub is public read-only mirror." style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;fontStyle=2;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="1010" width="1220" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="flow-summary" value="Flow:  push (dev branch)  →  Terraform pipeline (if applied changes)  +  App pipeline (build images + render manifests)  →  ECR + monorepo/dev  →  ArgoCD dev cluster syncs" style="text;html=1;fontSize=11;fontStyle=1;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="1060" width="1220" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-dev-tf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#e65100;" parent="1" source="dev" target="tf-gl" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-dev-app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#e65100;" parent="1" source="dev" target="app-gl" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-build-ecr" value="docker push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#e65100;fontSize=9;" parent="1" source="app-build-api" target="ecr" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-mani-mono" value="git push" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=6 3;rounded=0;strokeColor=#e65100;fontSize=9;fontStyle=2;" parent="1" source="app-manifest" target="mono-manifests" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-gh-mono" value="cpina push" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=6 3;rounded=0;strokeColor=#2e7d32;fontSize=9;fontStyle=2;" parent="1" source="app-gh-3" target="mono-manifests" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-gh-ecr" value="docker push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#2e7d32;fontSize=9;" parent="1" source="app-gh-2" target="ecr" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-mono-argocd" value="poll" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=6 3;rounded=0;fontSize=9;fontStyle=2;" parent="1" source="mono-manifests" target="argocd" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-argocd-eks" value="kubectl apply" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=9;" parent="1" source="argocd" target="eks-final" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-ecr-eks" value="image pull" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=6 3;rounded=0;fontSize=9;fontStyle=2;" parent="1" source="ecr" target="eks-final" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

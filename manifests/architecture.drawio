@@ -1,179 +1,181 @@
-<mxfile host="app.diagrams.net" modified="2026-08-26" agent="Claude" version="21.0.0">
-  <diagram name="manifests-gitops" id="manifests-gitops">
-    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-
-        <!-- TITLE -->
-        <mxCell id="title" value="manifests/ — GitOps Manifest Repository &amp; ArgoCD Sync Loop" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="300" y="20" width="1000" height="40" as="geometry" />
-        </mxCell>
-
-        <!-- LEGEND -->
-        <mxCell id="legend-box" value="Legend" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="1430" y="80" width="190" height="230" as="geometry" />
-        </mxCell>
-        <mxCell id="leg-cicd"  value="CI/CD Push"        style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="legend-box"><mxGeometry x="10" y="35"  width="170" height="22" as="geometry" /></mxCell>
-        <mxCell id="leg-repo"  value="manifests/ repo"   style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;" vertex="1" parent="legend-box"><mxGeometry x="10" y="67"  width="170" height="22" as="geometry" /></mxCell>
-        <mxCell id="leg-k8s"   value="K8s Namespace"     style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=10;" vertex="1" parent="legend-box"><mxGeometry x="10" y="99"  width="170" height="22" as="geometry" /></mxCell>
-        <mxCell id="leg-aws"   value="AWS Cloud"         style="rounded=1;fillColor=#ffffff;strokeColor=#232F3E;fontSize=10;" vertex="1" parent="legend-box"><mxGeometry x="10" y="131" width="170" height="22" as="geometry" /></mxCell>
-        <mxCell id="leg-solid" value="── Push / sync"    style="text;html=1;fontSize=10;" vertex="1" parent="legend-box"><mxGeometry x="10" y="163" width="170" height="22" as="geometry" /></mxCell>
-        <mxCell id="leg-dash"  value="- - - Poll / watch" style="text;html=1;fontSize=10;" vertex="1" parent="legend-box"><mxGeometry x="10" y="195" width="170" height="22" as="geometry" /></mxCell>
-
-        <!-- ===== LEFT: CI PUSH ===== -->
-        <mxCell id="ci-panel" value="CI Pipelines — Push Manifests" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="20" y="80" width="280" height="330" as="geometry" />
-        </mxCell>
-
-        <mxCell id="gl-push" value="GitLab CI&#xa;push_manifests job&#xa;(auto, prod branch)" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontStyle=1;fontSize=10;verticalAlign=top;" vertex="1" parent="ci-panel">
-          <mxGeometry x="10" y="40" width="260" height="115" as="geometry" />
-        </mxCell>
-        <mxCell id="gl-push-detail" value="helm template → rendered YAML&#xa;git push → manifests/ (GitLab)" style="text;html=1;fontSize=10;align=left;" vertex="1" parent="gl-push">
-          <mxGeometry x="10" y="45" width="240" height="50" as="geometry" />
-        </mxCell>
-
-        <mxCell id="gh-push" value="GitHub Actions&#xa;k8s_manifest_storing job&#xa;(manual, workflow_dispatch)" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" vertex="1" parent="ci-panel">
-          <mxGeometry x="10" y="170" width="260" height="115" as="geometry" />
-        </mxCell>
-        <mxCell id="gh-push-detail" value="helm template → rendered YAML&#xa;cpina action → manifests/ (GitHub)" style="text;html=1;fontSize=10;align=left;" vertex="1" parent="gh-push">
-          <mxGeometry x="10" y="45" width="240" height="50" as="geometry" />
-        </mxCell>
-
-        <!-- Mirror note -->
-        <mxCell id="mirror-note" value="GitLab → GitHub push mirror (ID 8)&#xa;ArgoCD watches ONE source at a time&#xa;(switched via Terraform MODE variable)" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="20" y="430" width="280" height="70" as="geometry" />
-        </mxCell>
-
-        <!-- GitOps Loop Steps -->
-        <mxCell id="loop-box" value="GitOps Loop" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="20" y="530" width="280" height="240" as="geometry" />
-        </mxCell>
-        <mxCell id="loop-s1" value="① Developer pushes to app/ (prod branch)" style="text;html=1;fontSize=10;align=left;" vertex="1" parent="loop-box"><mxGeometry x="10" y="35"  width="260" height="20" as="geometry" /></mxCell>
-        <mxCell id="loop-s2" value="② CI builds images, pushes to ECR"        style="text;html=1;fontSize=10;align=left;" vertex="1" parent="loop-box"><mxGeometry x="10" y="65"  width="260" height="20" as="geometry" /></mxCell>
-        <mxCell id="loop-s3" value="③ helm template → renders K8s YAML"       style="text;html=1;fontSize=10;align=left;" vertex="1" parent="loop-box"><mxGeometry x="10" y="95"  width="260" height="20" as="geometry" /></mxCell>
-        <mxCell id="loop-s4" value="④ CI commits YAML to manifests/ repo"      style="text;html=1;fontSize=10;align=left;" vertex="1" parent="loop-box"><mxGeometry x="10" y="125" width="260" height="20" as="geometry" /></mxCell>
-        <mxCell id="loop-s5" value="⑤ ArgoCD detects diff, syncs to EKS"      style="text;html=1;fontSize=10;align=left;" vertex="1" parent="loop-box"><mxGeometry x="10" y="155" width="260" height="20" as="geometry" /></mxCell>
-        <mxCell id="loop-s6" value="⑥ Pods updated, Lambda/ESM via ACK CRDs"  style="text;html=1;fontSize=10;align=left;" vertex="1" parent="loop-box"><mxGeometry x="10" y="185" width="260" height="20" as="geometry" /></mxCell>
-        <mxCell id="loop-s7" value="⑦ New version live at demoapp.prod.*"      style="text;html=1;fontSize=10;align=left;fontStyle=1;" vertex="1" parent="loop-box"><mxGeometry x="10" y="215" width="260" height="20" as="geometry" /></mxCell>
-
-        <!-- ===== CENTER: manifests/ REPO ===== -->
-        <mxCell id="repo-box" value="manifests/ repository  (branch: prod)" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontStyle=1;fontSize=13;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="340" y="80" width="680" height="870" as="geometry" />
-        </mxCell>
-
-        <!-- demoapp/demoapp/charts/api -->
-        <mxCell id="dir-api" value="charts/api/templates/" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;verticalAlign=top;" vertex="1" parent="repo-box">
-          <mxGeometry x="20" y="50" width="300" height="200" as="geometry" />
-        </mxCell>
-        <mxCell id="api-deploy" value="deployment.yaml&#xa;• Replicas: 1&#xa;• Image: ECR prod/api:&lt;sha8&gt;&#xa;• ConfigMap: SSM_PREFIX, AWS_REGION" style="rounded=1;fillColor=#e3f2fd;strokeColor=#6c8ebf;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="dir-api">
-          <mxGeometry x="10" y="35" width="280" height="70" as="geometry" /></mxCell>
-        <mxCell id="api-svc" value="service.yaml&#xa;• ClusterIP → port 8080" style="rounded=1;fillColor=#e3f2fd;strokeColor=#6c8ebf;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="dir-api">
-          <mxGeometry x="10" y="120" width="280" height="50" as="geometry" /></mxCell>
-
-        <!-- charts/ui -->
-        <mxCell id="dir-ui" value="charts/ui/templates/" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontStyle=1;fontSize=11;verticalAlign=top;" vertex="1" parent="repo-box">
-          <mxGeometry x="340" y="50" width="320" height="200" as="geometry" />
-        </mxCell>
-        <mxCell id="ui-deploy" value="deployment.yaml&#xa;• Replicas: 1&#xa;• Image: ECR prod/ui:&lt;sha8&gt;" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="dir-ui">
-          <mxGeometry x="10" y="35" width="300" height="60" as="geometry" /></mxCell>
-        <mxCell id="ui-svc" value="service.yaml&#xa;• ClusterIP → port 80" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="dir-ui">
-          <mxGeometry x="10" y="110" width="300" height="50" as="geometry" /></mxCell>
-
-        <!-- charts/ingress -->
-        <mxCell id="dir-ingress" value="charts/ingress/templates/" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=11;verticalAlign=top;" vertex="1" parent="repo-box">
-          <mxGeometry x="20" y="280" width="300" height="180" as="geometry" />
-        </mxCell>
-        <mxCell id="ingress-yaml" value="ingress.yaml&#xa;• IngressClass: nginx&#xa;• host: demoapp.prod.argocd-lab.kriolu-kloud.cv&#xa;• routes: /api/* → api:8080, /* → ui:80" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="dir-ingress">
-          <mxGeometry x="10" y="35" width="280" height="120" as="geometry" /></mxCell>
-
-        <!-- charts/lambda (ACK CRDs) -->
-        <mxCell id="dir-lambda" value="charts/lambda/templates/  (ACK CRDs)" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=11;verticalAlign=top;" vertex="1" parent="repo-box">
-          <mxGeometry x="340" y="280" width="320" height="310" as="geometry" />
-        </mxCell>
-        <mxCell id="lambda-fn-yaml" value="function.yaml&#xa;Kind: Function (ACK)&#xa;• PackageType: Image&#xa;• imageURI: ECR prod/lambda:&lt;sha8&gt;&#xa;• role: Lambda IAM role ARN" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="dir-lambda">
-          <mxGeometry x="10" y="35" width="300" height="100" as="geometry" /></mxCell>
-        <mxCell id="esm-yaml" value="eventsourcemapping.yaml&#xa;Kind: EventSourceMapping (ACK)&#xa;• eventSourceARN: SQS FIFO queue ARN&#xa;• functionName: prod-lambda&#xa;• batchSize: 10" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="dir-lambda">
-          <mxGeometry x="10" y="155" width="300" height="110" as="geometry" /></mxCell>
-
-        <!-- ACK note -->
-        <mxCell id="ack-note" value="ACK Lambda Controller translates these CRDs into AWS API calls.&#xa;No separate Lambda deployment pipeline needed — all GitOps." style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;fontStyle=2;" vertex="1" parent="repo-box">
-          <mxGeometry x="20" y="620" width="640" height="50" as="geometry" /></mxCell>
-
-        <!-- repo tree label -->
-        <mxCell id="repo-tree" value="demoapp/demoapp/charts/*  (rendered by helm template in CI)" style="text;html=1;fontSize=11;fontStyle=2;" vertex="1" parent="repo-box">
-          <mxGeometry x="20" y="690" width="640" height="20" as="geometry" /></mxCell>
-
-        <!-- security note -->
-        <mxCell id="sec-note" value="⚠ Keep this repo private — contains image URIs and environment config" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;" vertex="1" parent="repo-box">
-          <mxGeometry x="20" y="720" width="640" height="30" as="geometry" /></mxCell>
-
-        <!-- ===== RIGHT: AWS Cloud + ArgoCD ===== -->
-        <mxCell id="aws-cloud" value="AWS Cloud (us-east-1)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=#ffffff;verticalLabelPosition=top;verticalAlign=bottom;align=center;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1060" y="80" width="350" height="870" as="geometry" />
-        </mxCell>
-
-        <!-- EKS -->
-        <mxCell id="eks-box" value="EKS Cluster: eks-prod" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;verticalAlign=top;" vertex="1" parent="aws-cloud">
-          <mxGeometry x="20" y="50" width="310" height="700" as="geometry" />
-        </mxCell>
-
-        <!-- ArgoCD -->
-        <mxCell id="ns-argocd" value="namespace: argocd" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" vertex="1" parent="eks-box">
-          <mxGeometry x="15" y="40" width="280" height="170" as="geometry" />
-        </mxCell>
-        <mxCell id="argocd-server" value="ArgoCD Server" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;strokeColor=none;fillColor=#2e7d32;labelBackgroundColor=#ffffff;align=center;html=1;fontSize=10;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eks;" vertex="1" parent="ns-argocd">
-          <mxGeometry x="15" y="35" width="50" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="argo-config" value="Application: demoapp&#xa;repoURL: &lt;gitlab or github&gt;/manifests/&#xa;targetRevision: prod&#xa;auto-sync: enabled&#xa;prune: enabled · selfHeal: enabled" style="text;html=1;fontSize=10;align=left;" vertex="1" parent="ns-argocd">
-          <mxGeometry x="80" y="35" width="190" height="115" as="geometry" /></mxCell>
-
-        <!-- NS: application -->
-        <mxCell id="ns-app-eks" value="namespace: application" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" vertex="1" parent="eks-box">
-          <mxGeometry x="15" y="230" width="280" height="170" as="geometry" />
-        </mxCell>
-        <mxCell id="eks-api-pod"     value="API Deployment" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" vertex="1" parent="ns-app-eks"><mxGeometry x="10" y="40" width="120" height="40" as="geometry" /></mxCell>
-        <mxCell id="eks-ui-pod"      value="UI Deployment"  style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" vertex="1" parent="ns-app-eks"><mxGeometry x="150" y="40" width="120" height="40" as="geometry" /></mxCell>
-        <mxCell id="eks-ingress-res" value="Ingress (nginx)" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" vertex="1" parent="ns-app-eks"><mxGeometry x="10" y="100" width="120" height="40" as="geometry" /></mxCell>
-        <mxCell id="eks-svc-res"     value="Services"        style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" vertex="1" parent="ns-app-eks"><mxGeometry x="150" y="100" width="120" height="40" as="geometry" /></mxCell>
-
-        <!-- NS: ack-lambda -->
-        <mxCell id="ns-ack-eks" value="namespace: ack-lambda" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" vertex="1" parent="eks-box">
-          <mxGeometry x="15" y="420" width="280" height="190" as="geometry" />
-        </mxCell>
-        <mxCell id="ack-ctrl" value="ACK Lambda Controller" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" vertex="1" parent="ns-ack-eks">
-          <mxGeometry x="10" y="40" width="260" height="40" as="geometry" /></mxCell>
-        <mxCell id="fn-crd" value="Function CRD → AWS Lambda" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;" vertex="1" parent="ns-ack-eks">
-          <mxGeometry x="10" y="100" width="260" height="35" as="geometry" /></mxCell>
-        <mxCell id="esm-crd" value="EventSourceMapping CRD → SQS trigger" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;" vertex="1" parent="ns-ack-eks">
-          <mxGeometry x="10" y="148" width="260" height="35" as="geometry" /></mxCell>
-
-        <!-- ArgoCD URL note -->
-        <mxCell id="argo-url" value="argo.prod.argocd-lab.kriolu-kloud.cv" style="text;html=1;fontSize=10;fontStyle=2;" vertex="1" parent="eks-box">
-          <mxGeometry x="15" y="625" width="280" height="20" as="geometry" /></mxCell>
-
-        <!-- ===== EDGES ===== -->
-        <!-- GL CI → repo -->
-        <mxCell id="e-gl-repo" value="git push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#e65100;" edge="1" source="gl-push" target="repo-box" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <!-- GH CI → repo -->
-        <mxCell id="e-gh-repo" value="git push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#2e7d32;" edge="1" source="gh-push" target="repo-box" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <!-- ArgoCD polls repo (dashed) -->
-        <mxCell id="e-argo-poll" value="polls every 3 min" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=8 4;rounded=0;" edge="1" source="argocd-server" target="repo-box" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <!-- ArgoCD applies to namespaces -->
-        <mxCell id="e-argo-app" value="kubectl apply" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="argocd-server" target="ns-app-eks" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e-argo-ack" value="kubectl apply" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="argocd-server" target="ns-ack-eks" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="65bd71144e">
+    <diagram name="manifests-gitops" id="manifests-gitops">
+        <mxGraphModel dx="1767" dy="1370" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="manifests/ — folder in cluster-eks-argocd monorepo, watched by ArgoCD (per-env branch)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="20" width="1000" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-box" value="Legend" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="1430" y="80" width="190" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-cicd" value="CI/CD Push" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="35" width="170" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-repo" value="manifests/ repo" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="67" width="170" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-k8s" value="K8s Namespace" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=10;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="99" width="170" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-aws" value="AWS Cloud" style="rounded=1;fillColor=#ffffff;strokeColor=#232F3E;fontSize=10;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="131" width="170" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-solid" value="── Push / sync" style="text;html=1;fontSize=10;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="163" width="170" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg-dash" value="- - - Poll / watch" style="text;html=1;fontSize=10;" parent="legend-box" vertex="1">
+                    <mxGeometry x="10" y="195" width="170" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="ci-panel" value="CI Pipelines — Push Manifests" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="80" width="280" height="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="gl-push" value="GitLab CI (app-eks-argocd)&#10;push_manifests job&#10;auto on dev/staging/qa/prod" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontStyle=1;fontSize=10;verticalAlign=top;" parent="ci-panel" vertex="1">
+                    <mxGeometry x="10" y="40" width="260" height="115" as="geometry"/>
+                </mxCell>
+                <mxCell id="gl-push-detail" value="helm template → rendered YAML&#10;git push → cluster-eks-argocd&#10;branch = same as source" style="text;html=1;fontSize=9;align=left;" parent="gl-push" vertex="1">
+                    <mxGeometry x="10" y="45" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="gh-push" value="GitHub Actions (app-eks-argocd)&#10;k8s_manifest_storing job&#10;on push OR workflow_dispatch" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" parent="ci-panel" vertex="1">
+                    <mxGeometry x="10" y="170" width="260" height="115" as="geometry"/>
+                </mxCell>
+                <mxCell id="gh-push-detail" value="helm template → rendered YAML&#10;cpina action → cluster-eks-argocd&#10;target = manifests/demoapp/" style="text;html=1;fontSize=9;align=left;" parent="gh-push" vertex="1">
+                    <mxGeometry x="10" y="45" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="mirror-note" value="Both cluster-eks-argocd repos (GitLab + GitHub mirror id 10)&#10;are branch-per-env: dev, staging, qa, prod.&#10;Each ArgoCD cluster watches its own branch." style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=9;fontStyle=2;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="430" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-box" value="GitOps Loop" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="530" width="280" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-s1" value="① Developer pushes to app-eks-argocd (dev/staging/qa/prod)" style="text;html=1;fontSize=9;align=left;" parent="loop-box" vertex="1">
+                    <mxGeometry x="10" y="35" width="260" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-s2" value="② CI builds 3 images (api,ui,lambda) → ECR &lt;env&gt;/*" style="text;html=1;fontSize=9;align=left;" parent="loop-box" vertex="1">
+                    <mxGeometry x="10" y="65" width="260" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-s3" value="③ helm template → renders K8s YAML" style="text;html=1;fontSize=10;align=left;" parent="loop-box" vertex="1">
+                    <mxGeometry x="10" y="95" width="260" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-s4" value="④ CI commits YAML to cluster-eks-argocd/manifests/demoapp/" style="text;html=1;fontSize=9;align=left;" parent="loop-box" vertex="1">
+                    <mxGeometry x="10" y="125" width="260" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-s5" value="⑤ ArgoCD detects diff, syncs to EKS" style="text;html=1;fontSize=10;align=left;" parent="loop-box" vertex="1">
+                    <mxGeometry x="10" y="155" width="260" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-s6" value="⑥ Pods updated, Lambda/ESM via ACK CRDs" style="text;html=1;fontSize=10;align=left;" parent="loop-box" vertex="1">
+                    <mxGeometry x="10" y="185" width="260" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop-s7" value="⑦ New version live at demoapp.&lt;env&gt;.argocd-lab.kriolu-kloud.cv" style="text;html=1;fontSize=9;align=left;fontStyle=1;" parent="loop-box" vertex="1">
+                    <mxGeometry x="10" y="215" width="260" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="repo-box" value="cluster-eks-argocd/manifests/demoapp/  (branches: dev · staging · qa · prod)" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontStyle=1;fontSize=12;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="340" y="80" width="680" height="870" as="geometry"/>
+                </mxCell>
+                <mxCell id="dir-api" value="charts/api/templates/" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;verticalAlign=top;" parent="repo-box" vertex="1">
+                    <mxGeometry x="20" y="50" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="api-deploy" value="deployment.yaml&#10;• Replicas: 1&#10;• Image: ECR &lt;env&gt;/api:&lt;sha8&gt;&#10;• ConfigMap: SSM_PREFIX, AWS_REGION" style="rounded=1;fillColor=#e3f2fd;strokeColor=#6c8ebf;fontSize=10;align=left;spacingLeft=8;" parent="dir-api" vertex="1">
+                    <mxGeometry x="10" y="35" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="api-svc" value="service.yaml&#10;• ClusterIP → port 8080" style="rounded=1;fillColor=#e3f2fd;strokeColor=#6c8ebf;fontSize=10;align=left;spacingLeft=8;" parent="dir-api" vertex="1">
+                    <mxGeometry x="10" y="120" width="280" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dir-ui" value="charts/ui/templates/" style="rounded=1;fillColor=#ffe0b2;strokeColor=#e65100;fontStyle=1;fontSize=11;verticalAlign=top;" parent="repo-box" vertex="1">
+                    <mxGeometry x="340" y="50" width="320" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="ui-deploy" value="deployment.yaml&#10;• Replicas: 1&#10;• Image: ECR &lt;env&gt;/ui:&lt;sha8&gt;" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;align=left;spacingLeft=8;" parent="dir-ui" vertex="1">
+                    <mxGeometry x="10" y="35" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ui-svc" value="service.yaml&#10;• ClusterIP → port 80" style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;align=left;spacingLeft=8;" parent="dir-ui" vertex="1">
+                    <mxGeometry x="10" y="110" width="300" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dir-ingress" value="charts/ingress/templates/" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=11;verticalAlign=top;" parent="repo-box" vertex="1">
+                    <mxGeometry x="20" y="280" width="300" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="ingress-yaml" value="ingress.yaml&#10;• IngressClass: nginx&#10;• host: demoapp.&lt;env&gt;.argocd-lab.kriolu-kloud.cv&#10;• routes: /api/* → api:8080, /* → ui:80" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;align=left;spacingLeft=8;" parent="dir-ingress" vertex="1">
+                    <mxGeometry x="10" y="35" width="280" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="dir-lambda" value="charts/lambda/templates/  (ACK CRDs)" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=11;verticalAlign=top;" parent="repo-box" vertex="1">
+                    <mxGeometry x="340" y="280" width="320" height="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="lambda-fn-yaml" value="lambda.yaml&#10;Kind: Function (ACK)&#10;• PackageType: Image&#10;• imageURI: ECR &lt;env&gt;/lambda:&lt;sha8&gt;&#10;• role: Lambda IAM role ARN" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=8;" parent="dir-lambda" vertex="1">
+                    <mxGeometry x="10" y="35" width="300" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="esm-yaml" value="lambda-event-source-mapping.yaml&#10;Kind: EventSourceMapping (ACK)&#10;• eventSourceARN: SQS FIFO queue ARN&#10;• functionName: &lt;env&gt;-lambda&#10;• batchSize: 10" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=8;" parent="dir-lambda" vertex="1">
+                    <mxGeometry x="10" y="155" width="300" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="ack-note" value="ACK Lambda Controller translates these CRDs into AWS API calls.&#10;No separate Lambda deployment pipeline needed — all GitOps." style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;fontStyle=2;" parent="repo-box" vertex="1">
+                    <mxGeometry x="20" y="620" width="640" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="repo-tree" value="Full path: cluster-eks-argocd/manifests/demoapp/demoapp/charts/*  (rendered by helm template in app CI)" style="text;html=1;fontSize=10;fontStyle=2;" parent="repo-box" vertex="1">
+                    <mxGeometry x="20" y="690" width="640" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="sec-note" value="⚠ Repo is PUBLIC — do NOT commit real secrets. Only image URIs + non-sensitive env config." style="rounded=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;" parent="repo-box" vertex="1">
+                    <mxGeometry x="20" y="720" width="640" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="aws-cloud" value="AWS Cloud (us-east-1)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=#ffffff;verticalLabelPosition=top;verticalAlign=bottom;align=center;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="1060" y="80" width="350" height="870" as="geometry"/>
+                </mxCell>
+                <mxCell id="eks-box" value="EKS Cluster: eks-prod" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;verticalAlign=top;" parent="aws-cloud" vertex="1">
+                    <mxGeometry x="20" y="50" width="310" height="700" as="geometry"/>
+                </mxCell>
+                <mxCell id="ns-argocd" value="namespace: argocd" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" parent="eks-box" vertex="1">
+                    <mxGeometry x="15" y="40" width="280" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="argocd-server" value="ArgoCD Server" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;strokeColor=none;fillColor=#2e7d32;labelBackgroundColor=#ffffff;align=center;html=1;fontSize=10;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eks;" parent="ns-argocd" vertex="1">
+                    <mxGeometry x="15" y="35" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="argo-config" value="Application: demoapp&#10;repoURL: cluster-eks-argocd&#10;path: manifests/demoapp&#10;targetRevision: &lt;env&gt;&#10;auto-sync + prune + selfHeal" style="text;html=1;fontSize=9;align=left;" parent="ns-argocd" vertex="1">
+                    <mxGeometry x="80" y="35" width="190" height="115" as="geometry"/>
+                </mxCell>
+                <mxCell id="ns-app-eks" value="namespace: application" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" parent="eks-box" vertex="1">
+                    <mxGeometry x="15" y="230" width="280" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="eks-api-pod" value="API Deployment" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" parent="ns-app-eks" vertex="1">
+                    <mxGeometry x="10" y="40" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="eks-ui-pod" value="UI Deployment" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" parent="ns-app-eks" vertex="1">
+                    <mxGeometry x="150" y="40" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="eks-ingress-res" value="Ingress (nginx)" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" parent="ns-app-eks" vertex="1">
+                    <mxGeometry x="10" y="100" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="eks-svc-res" value="Services" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" parent="ns-app-eks" vertex="1">
+                    <mxGeometry x="150" y="100" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="ns-ack-eks" value="namespace: ack-lambda" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontStyle=1;fontSize=10;verticalAlign=top;" parent="eks-box" vertex="1">
+                    <mxGeometry x="15" y="420" width="280" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="ack-ctrl" value="ACK Lambda Controller" style="rounded=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;" parent="ns-ack-eks" vertex="1">
+                    <mxGeometry x="10" y="40" width="260" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="fn-crd" value="Function CRD → AWS Lambda" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;" parent="ns-ack-eks" vertex="1">
+                    <mxGeometry x="10" y="100" width="260" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="esm-crd" value="EventSourceMapping CRD → SQS trigger" style="rounded=1;fillColor=#ffebee;strokeColor=#b85450;fontSize=10;" parent="ns-ack-eks" vertex="1">
+                    <mxGeometry x="10" y="148" width="260" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="argo-url" value="argo.&lt;env&gt;.argocd-lab.kriolu-kloud.cv" style="text;html=1;fontSize=10;fontStyle=2;" parent="eks-box" vertex="1">
+                    <mxGeometry x="15" y="625" width="280" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-gl-repo" value="git push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#e65100;" parent="1" source="gl-push" target="repo-box" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-gh-repo" value="git push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#2e7d32;" parent="1" source="gh-push" target="repo-box" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-argo-poll" value="polls every 3 min" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=8 4;rounded=0;" parent="1" source="argocd-server" target="repo-box" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-argo-app" value="kubectl apply" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" parent="1" source="argocd-server" target="ns-app-eks" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-argo-ack" value="kubectl apply" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" parent="1" source="argocd-server" target="ns-ack-eks" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>
