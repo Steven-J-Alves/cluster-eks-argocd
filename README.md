@@ -2,7 +2,8 @@
 
 Mono-repo for the **EKS + ArgoCD** GitOps platform: Terraform code that provisions the AWS infrastructure and the Kubernetes manifests that ArgoCD watches and reconciles.
 
-The demo application code lives in a **separate** repo: [`app-eks-argocd`](https://gitlab.kriolu-kloud.cv/kriolu-kloud/apps-for-deploy/app-eks-argocd) (GitLab) / [`Steven-J-Alves/app-eks-argocd`](https://github.com/Steven-J-Alves/app-eks-argocd) (GitHub).
+**Related project (application source)**:
+[GitLab `app-eks-argocd`](https://gitlab.kriolu-kloud.cv/kriolu-kloud/apps-for-deploy/app-eks-argocd) · [GitHub `app-eks-argocd`](https://github.com/Steven-J-Alves/app-eks-argocd)
 
 ## System overview
 
